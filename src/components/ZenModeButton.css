@@ -1,0 +1,42 @@
+.zen-mode-button {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: rgba(30, 30, 35, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2500;
+  color: var(--color-text);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.zen-mode-button:hover {
+  background: rgba(40, 37, 42, 0.98);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.zen-mode-button:active {
+  transform: translateY(0) scale(1);
+}
