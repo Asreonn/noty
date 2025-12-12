@@ -1,0 +1,405 @@
+/* Board - Simple Corkboard with Screw */
+.board {
+  position: absolute;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+  will-change: left, top;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Board appears above notes and tapes */
+  z-index: 50;
+  /* NO padding-top - frame starts at position.y to align with note */
+}
+
+.board.dragging .board-frame {
+  box-shadow: 
+    0 25px 50px rgba(0,0,0,0.3);
+}
+
+/* Screw at top - positioned ABOVE the frame (like tape on note) */
+.board-screw {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  cursor: grab;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-screw:active {
+  cursor: grabbing;
+}
+
+.board-screw .screw-head {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #5a5a5a;
+  border: 2px solid #4a4a4a;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  position: relative;
+}
+
+.board-screw .screw-head::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 2px;
+  background: #3a3a3a;
+  border-radius: 1px;
+}
+
+/* Main Board Frame - Matches note dimensions exactly */
+/* Note: width 220px, min-height 220px */
+/* Main Board Frame - Width set by JS based on column count */
+.board-frame {
+  position: relative;
+  /* width set inline by Board.jsx */
+  min-width: 240px; /* Min for 1 column + padding */
+  min-height: 496px; /* Adjusted to match previous total height (536px) with new padding */
+  /* Lighter Muted Cork - Better contrast but still chill */
+  background-color: #dcc5a6;
+  /* Soft Cork Texture - Subtle and smooth */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.3' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+
+  /* Lighter Wood Border */
+  border: 12px solid #c4a484;
+  border-radius: 12px;
+  box-shadow:
+    inset 2px 2px 6px rgba(60, 50, 40, 0.2),
+    0 15px 35px rgba(0,0,0,0.2);
+
+  padding: 0; /* No padding - let board-content handle spacing */
+  box-sizing: border-box; /* Border included in width */
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+/* Board Header */
+.board-header {
+  padding: 8px 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  min-height: 40px;
+  
+  /* Fixed Note Style */
+  background: #fdf6e3; /* Creamy paper color */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transform: rotate(-1deg); /* Slight rotation for natural look */
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 2px;
+  position: relative;
+  z-index: 2;
+}
+
+.board-title {
+  font-family: 'Patrick Hand', cursive;
+  color: #3d2e1f;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+
+.board-title-input {
+  font-family: 'Patrick Hand', cursive;
+  color: #3d2e1f;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+  text-align: center;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 12px;
+  margin: 0;
+  min-width: 120px;
+  width: auto;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+/* Board Content */
+.board-content {
+  display: flex;
+  flex-direction: row; /* Side by side columns */
+  justify-content: center; /* Center columns */
+  gap: 40px; /* Gap between columns */
+  width: 100%;
+  align-items: flex-start;
+  padding: 20px 0 10px; /* Only top and bottom padding */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Column - Fixed width */
+.board-column {
+  display: flex;
+  flex-direction: column;
+  width: 220px; /* Same as note width */
+  flex-shrink: 0;
+  transition: width 0.3s ease;
+}
+
+.board-column.wide {
+  width: 480px; /* 2 Notes (220*2) + 1 Gap (40) */
+}
+
+.board-column-header {
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  text-align: center;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  min-height: 32px;
+  
+  /* Fixed Note Style - Smaller */
+  background: #fdf6e3;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+  transform: rotate(0.5deg);
+  border-radius: 2px;
+}
+
+.board-column-name {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  color: #4a3820;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+  display: block;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.board-column-name-input {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  color: #4a3820;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+  display: block;
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 80px;
+  width: auto;
+  max-width: 200px;
+  padding: 0 8px;
+  margin: 0;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.board-column-content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 80px;
+  flex: 1;
+}
+
+/* Todo Item - Paper Note (bigger) */
+.board-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--note-yellow);
+  cursor: pointer;
+  padding-top: 14px;
+  min-height: 150px; /* Taller default height */
+  height: auto;
+  box-shadow:
+    2px 2px 6px rgba(0,0,0,0.15),
+    0 1px 3px rgba(0,0,0,0.1);
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  transition: min-height 0.3s ease;
+}
+
+.board-item.dragging {
+  opacity: 0.3;
+}
+
+/* Keep expanded state during drag */
+.board-item.dragging.expanded {
+  min-height: 326px;
+}
+
+.board-item.dragging.expanded .board-item-content,
+.board-item.dragging.expanded .board-item-input {
+  height: 288px;
+  max-height: 288px;
+}
+
+/* Ghost item while dragging */
+.board-item-ghost {
+  display: flex;
+  flex-direction: column;
+  background: var(--note-yellow);
+  padding-top: 12px;
+  box-shadow: 
+    4px 4px 15px rgba(0,0,0,0.3);
+  width: 240px;
+  border-radius: 2px;
+}
+
+.board-item-ghost.yellow { background-color: var(--note-yellow); }
+.board-item-ghost.red { background-color: var(--note-red); }
+.board-item-ghost.blue { background-color: var(--note-blue); }
+.board-item-ghost.green { background-color: var(--note-green); }
+.board-item-ghost.purple { background-color: var(--note-purple); }
+.board-item-ghost.orange { background-color: var(--note-orange); }
+.board-item-ghost.pink { background-color: var(--note-pink); }
+.board-item-ghost.cyan { background-color: var(--note-cyan); }
+
+/* Pushpin on item - same as Notes */
+.board-item-pin {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.board-item-pin .pushpin-head {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 40% 40%,
+    #FFB8B8 0%,
+    #FFA0A0 50%,
+    #FF8888 100%
+  );
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 2px 5px rgba(0, 0, 0, 0.18),
+    inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.12),
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.6);
+  position: relative;
+  z-index: 2;
+}
+
+.board-item-pin .pushpin-needle {
+  width: 2.5px;
+  height: 7px;
+  background: rgba(100, 100, 100, 0.5);
+  border-radius: 0 0 1px 1px;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.board-item-body {
+  padding: 10px 14px 14px 14px;
+  min-height: 108px; /* 150px item - 14px padding-top - 10px this padding-top - 14px this padding-bottom = 112px content area */
+  display: flex;
+  align-items: flex-start; /* Top align so it doesn't shift between modes */
+  flex: 1;
+}
+
+/* Item Colors */
+.board-item.yellow { background-color: var(--note-yellow); }
+.board-item.red { background-color: var(--note-red); }
+.board-item.blue { background-color: var(--note-blue); }
+.board-item.green { background-color: var(--note-green); }
+.board-item.purple { background-color: var(--note-purple); }
+.board-item.orange { background-color: var(--note-orange); }
+.board-item.pink { background-color: var(--note-pink); }
+.board-item.cyan { background-color: var(--note-cyan); }
+
+.board-item-content,
+.board-item-input {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.15rem;
+  color: #2c241b;
+  line-height: 1.4;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  min-height: 108px; /* Match body height - stays consistent in both modes */
+  height: 108px; /* Fixed height for normal state */
+  resize: none; /* Disable manual resize */
+  overflow-y: auto; /* Enable scroll for long content */
+  max-height: none; /* Will be controlled by line limit */
+}
+
+/* Expanded state - Visual height from pushpin to pushpin of 2 todos + gap */
+/* Todo 1: 150px, Gap: 14px, Todo 2 start with pushpin at -6px = need extra 12px for pushpins */
+/* Total: 150 + 14 + 150 + 12 = 326px */
+.board-item.expanded {
+  min-height: 326px;
+}
+
+/* Expanded state: More lines for expanded height */
+.board-item.expanded .board-item-content,
+.board-item.expanded .board-item-input {
+  height: 288px; /* 326px total - 14px item padding-top - 10px body padding-top - 14px body padding-bottom */
+  max-height: 288px;
+  overflow-y: auto;
+}
+
+.board-item-input::placeholder {
+  color: rgba(0,0,0,0.3);
+}
+
+/* Silent add zone */
+.board-column-add-zone {
+  min-height: 40px;
+  margin-top: 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  /* Removed dashed border and opacity */
+  border: none;
+  opacity: 1; /* Always visible but subtle */
+  background: transparent;
+}
+
+.board-column-add-zone:hover {
+  /* Removed glow/background change */
+  background: transparent;
+  border-color: transparent;
+  opacity: 1;
+}
+
+/* Drop preview placeholder - Shows where item will be dropped */
+.board-item-placeholder {
+  min-height: 150px;
+  margin: 0;
+  border: 2px dashed rgba(100, 80, 60, 0.3);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  transition: min-height 0.2s ease;
+}
+
+/* Expanded placeholder for expanded items */
+.board-item-placeholder.expanded {
+  min-height: 326px;
+}

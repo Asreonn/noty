@@ -1,0 +1,703 @@
+.note {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 220px;
+  min-height: 220px;
+  background-color: var(--note-yellow);
+  box-shadow: 
+    2px 2px 5px rgba(0,0,0,0.2),
+    10px 10px 15px rgba(0,0,0,0.1);
+  border-radius: 2px 2px 25px 2px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.3rem;
+  color: #2d2a2e;
+  /* Smooth hareket - pinler ve ipler anında takip eder */
+  transition: left 0.05s ease-out, top 0.05s ease-out, box-shadow 0.2s, background-color 0.3s, border 0.2s;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  border: 2px solid transparent;
+  isolation: isolate;
+  /* GPU acceleration */
+  will-change: left, top;
+}
+
+.note *{
+  /* Shift basılıyken text selection disabled */
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+}
+
+/* Global shift key detection için */
+body.shift-pressed .note,
+body.shift-pressed .note * {
+  cursor: crosshair !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+}
+
+body.shift-pressed .rich-text-editor {
+  cursor: crosshair !important;
+  pointer-events: none; /* Shift basılıyken yazıya tıklama engellenir */
+}
+
+/* Edit mode indicator - note stays lifted */
+.note {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.note.editing {
+  transform: scale(1.05) !important;
+}
+
+/* Tape stays in place */
+.note-tape {
+  transform-origin: center;
+  transition: none;
+}
+
+.note.selected {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+    z-index: 10;
+}
+
+.note.yellow { background-color: var(--note-yellow); }
+.note.red { background-color: var(--note-red); }
+.note.blue { background-color: var(--note-blue); }
+.note.green { background-color: var(--note-green); }
+.note.purple { background-color: var(--note-purple); }
+.note.orange { background-color: var(--note-orange); }
+.note.pink { background-color: var(--note-pink); }
+.note.cyan { background-color: var(--note-cyan); }
+
+/* Tape effect */
+.note-tape {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1deg);
+  width: 100px;
+  height: 35px;
+  background-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.15);
+  cursor: grab;
+  z-index: 20;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.note-tape:hover {
+    background-color: rgba(255, 255, 255, 0.35);
+    transform: translateX(-50%) rotate(-1deg) scale(1.02);
+}
+
+.note-tape:active {
+    cursor: grabbing;
+}
+
+.note:active {
+  box-shadow: 4px 4px 20px rgba(0,0,0,0.3);
+  z-index: 100;
+}
+
+
+.note-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.style-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.style-btn:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: currentColor;
+    border: 1px solid rgba(0,0,0,0.2);
+    opacity: 0.6;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 2px;
+}
+
+.delete-btn:hover {
+  color: #d32f2f;
+}
+
+.note-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.rich-text-editor {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  cursor: text;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.rich-text-editor[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: rgba(0,0,0,0.4);
+  font-style: italic;
+}
+
+/* Toolbar Container */
+/* Editor Toolbar Portal Container */
+.note-toolbar-portal {
+  /* Styles are now inline in Note.jsx for dynamic positioning */
+}
+
+/* Editor Toolbar */
+.editor-toolbar {
+  pointer-events: auto;
+  background: rgba(30, 30, 35, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50px;
+  padding: 12px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: slideInLeft 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 2500;
+}
+
+/* Ensure toolbar hides when not editing (handled by React, but add exit animation support if needed later) */
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-group.relative {
+  position: relative;
+}
+
+.toolbar-divider {
+  width: 20px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1); /* Lighter divider for dark theme */
+  margin: 2px auto;
+}
+
+.editor-toolbar button {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7); /* Light text for dark theme */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.editor-toolbar button:hover, .editor-toolbar button.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Slider Styling (Vertical via Rotation) */
+.size-popover {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 8px;
+    background: rgba(30, 30, 35, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    animation: popIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    min-width: auto;
+    height: auto;
+}
+
+.vertical-slider-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100px; /* Reduced height */
+  width: 40px; /* Reduced width */
+}
+
+.vertical-slider {
+  position: absolute;
+  left: -35px;
+  top: 50%;
+  width: 80px; /* Reduced length */
+  height: 4px;
+  transform: translateY(-50%) rotate(-90deg);
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.vertical-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.vertical-slider-labels {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  height: 80px; /* Match reduced slider length */
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Inter', sans-serif;
+  margin-left: 20px; /* Tighter spacing */
+  z-index: 1;
+  font-size: 0.75rem; /* Slightly smaller font */
+}
+
+/* Color Popover */
+.color-popover {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 12px;
+    background: rgba(30, 30, 35, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 8px;
+    border-radius: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    animation: popIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: translateY(-50%) scale(0.9); }
+    to { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+
+.color-btn {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+  padding: 0 !important;
+  transition: transform 0.2s !important;
+}
+
+.color-btn:hover {
+  transform: scale(1.2) !important;
+  background: none !important; /* Override default hover bg */
+}
+
+/* Font Popover */
+.font-popover {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 12px;
+    background: rgba(30, 30, 35, 0.6);
+    padding: 8px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    animation: popIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    min-width: 100px;
+}
+
+.font-option-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 6px 12px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.font-option-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Pin System - Pano Stil Raptiyeler */
+.note-pin {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #8B4513 40%, #654321 100%);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  cursor: crosshair;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 15;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Pin konumları */
+.note-pin.top { 
+  top: -5px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+}
+
+.note-pin.right { 
+  right: -5px; 
+  top: 50%; 
+  transform: translateY(-50%); 
+}
+
+.note-pin.bottom { 
+  bottom: -5px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+}
+
+.note-pin.left { 
+  left: -5px; 
+  top: 50%; 
+  transform: translateY(-50%); 
+}
+
+/* Pin görünürlüğü - not hover'da */
+.note:hover .note-pin {
+  opacity: 0.6;
+  pointer-events: auto;
+}
+
+/* Pin hover efekti */
+.note-pin:hover {
+  opacity: 1 !important;
+  transform: scale(1.5);
+  box-shadow: 
+    0 0 8px rgba(139, 69, 19, 0.8),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.note-pin.top:hover {
+  transform: translateX(-50%) scale(1.5);
+}
+
+.note-pin.bottom:hover {
+  transform: translateX(-50%) scale(1.5);
+}
+
+.note-pin.right:hover {
+  transform: translateY(-50%) scale(1.5);
+}
+
+.note-pin.left:hover {
+  transform: translateY(-50%) scale(1.5);
+}
+
+/* Aktif pin (bağlantı modu başladığında) */
+.note-pin.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  background: radial-gradient(circle, #FF6B35 40%, #FF4500 100%);
+  animation: pin-pulse 0.6s ease-in-out infinite;
+}
+
+.note-pin.top.active {
+  transform: translateX(-50%) scale(1.3);
+  animation: pin-pulse-top 0.6s ease-in-out infinite;
+}
+
+.note-pin.bottom.active {
+  transform: translateX(-50%) scale(1.3);
+  animation: pin-pulse-bottom 0.6s ease-in-out infinite;
+}
+
+.note-pin.right.active {
+  transform: translateY(-50%) scale(1.3);
+  animation: pin-pulse-right 0.6s ease-in-out infinite;
+}
+
+.note-pin.left.active {
+  transform: translateY(-50%) scale(1.3);
+  animation: pin-pulse-left 0.6s ease-in-out infinite;
+}
+
+/* Bağlantısı olan pin */
+.note-pin.has-connection {
+  opacity: 1;
+  pointer-events: auto;
+  background: radial-gradient(circle, #FF8C00 40%, #FF6347 100%);
+}
+
+/* Pin pulse animasyonları */
+@keyframes pin-pulse-top {
+  0%, 100% { transform: translateX(-50%) scale(1.3); }
+  50% { transform: translateX(-50%) scale(1.6); }
+}
+
+@keyframes pin-pulse-bottom {
+  0%, 100% { transform: translateX(-50%) scale(1.3); }
+  50% { transform: translateX(-50%) scale(1.6); }
+}
+
+@keyframes pin-pulse-right {
+  0%, 100% { transform: translateY(-50%) scale(1.3); }
+  50% { transform: translateY(-50%) scale(1.6); }
+}
+
+@keyframes pin-pulse-left {
+  0%, 100% { transform: translateY(-50%) scale(1.3); }
+  50% { transform: translateY(-50%) scale(1.6); }
+}
+
+/* Bağlantı modunda tüm pinler görünür */
+.note.connecting-mode .note-pin {
+  opacity: 0.8;
+  pointer-events: auto;
+}
+
+/* MINIMAL COZY Pin Tasarımı - Daha Görünür */
+
+/* Pin - Minimal ama Belirgin */
+.note-pushpin {
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 1000;
+  /* Pozisyon transition YOK - nota anında yapışık */
+  transition: transform 0.2s ease;
+  /* GPU acceleration için */
+  will-change: left, top;
+}
+
+.pushpin-head {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  /* Daha canlı pastel coral */
+  background: radial-gradient(
+    circle at 40% 40%,
+    #FFB8B8 0%,      /* Parlak pastel pembe */
+    #FFA0A0 50%,     /* Canlı pembe */
+    #FF8888 100%     /* Mercan */
+  );
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 2px 5px rgba(0, 0, 0, 0.18),
+    inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.12),
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.6);
+  position: relative;
+  z-index: 2;
+  transition: all 0.25s ease;
+}
+
+.pushpin-head:hover {
+  transform: scale(1.25);  /* Biraz büyüyor */
+  background: radial-gradient(
+    circle at 40% 40%,
+    #FFC8C8 0%,
+    #FFB0B0 50%,
+    #FF9898 100%
+  );
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.25),
+    0 0 12px rgba(255, 136, 136, 0.4),  /* Parlama */
+    inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.12),
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.6);
+}
+
+.pushpin-needle {
+  width: 2.5px;
+  height: 7px;
+  background: rgba(100, 100, 100, 0.5);
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%);
+  border-radius: 0 0 1px 1px;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+/* Aktif pin - parlak turuncu */
+.active-connecting .pushpin-head.pulsing {
+  background: radial-gradient(
+    circle at 40% 40%,
+    #FFDAA0 0%,
+    #FFC070 50%,
+    #FFAA50 100%
+  );
+  animation: strong-pulse 0.85s ease-in-out infinite;
+  box-shadow: 
+    0 0 16px rgba(255, 170, 80, 0.75),
+    0 3px 6px rgba(0, 0, 0, 0.2),
+    inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.12),
+    inset 1.5px 1.5px 3px rgba(255, 235, 180, 0.7);
+}
+
+/* Bağlantı hover - pin de highlight olur */
+.note-pushpin.hovered .pushpin-head {
+  transform: scale(1.25);
+  background: radial-gradient(
+    circle at 40% 40%,
+    #FFC8C8 0%,
+    #FFB0B0 50%,
+    #FF9898 100%
+  );
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.25),
+    0 0 12px rgba(255, 136, 136, 0.4),
+    inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.12),
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.6);
+}
+
+/* Shift basılıyken pin'ler draggable - grab cursor */
+.shift-pressed .note-pushpin {
+  cursor: grab;
+}
+
+.shift-pressed .note-pushpin:hover .pushpin-head {
+  transform: scale(1.3);
+  background: radial-gradient(
+    circle at 40% 40%,
+    #FFD8D8 0%,
+    #FFC0C0 50%,
+    #FFA8A8 100%
+  );
+  box-shadow:
+    0 5px 10px rgba(0, 0, 0, 0.3),
+    0 0 16px rgba(255, 136, 136, 0.5);
+}
+
+/* Pin drag edilirken */
+.note-pushpin.dragging {
+  cursor: grabbing !important;
+  z-index: 2000;
+}
+
+.note-pushpin.dragging .pushpin-head {
+  transform: scale(1.5);
+  background: radial-gradient(
+    circle at 40% 40%,
+    #FFE8A8 0%,
+    #FFD088 50%,
+    #FFB868 100%
+  );
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(255, 184, 104, 0.7);
+  animation: pin-drag-pulse 0.6s ease-in-out infinite;
+}
+
+@keyframes pin-drag-pulse {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.15);
+  }
+}
+
+@keyframes strong-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 16px rgba(255, 170, 80, 0.75);
+  }
+  50% {
+    transform: scale(1.25);
+    box-shadow: 0 0 24px rgba(255, 170, 80, 0.95);
+  }
+}
+
+/* Eski pin-glow animasyonu - artık kullanılmıyor ama uyumluluk için kalsın */
+@keyframes pin-glow {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 12px rgba(255, 107, 53, 0.8), 0 3px 6px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 20px rgba(255, 107, 53, 1), 0 3px 8px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Aktif pin göstergesi - yapışık */
+.note-pin-indicator {
+  /* Pozisyon transition YOK */
+  transition: transform 0.2s ease;
+  will-change: left, top;
+}

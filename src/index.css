@@ -1,0 +1,118 @@
+:root {
+  /* Cozy Dark Palette with softer tones */
+  --color-bg: #1a1a1e; /* Deeper, softer background */
+  --color-text: #f0e6d6; /* Warmer, creamier text */
+  --color-grid: rgba(255, 255, 255, 0.03);
+
+  /* Pastel Note Colors - Softer and more harmonious */
+  --note-yellow: #f9e4a7; /* Soft butter yellow */
+  --note-red: #f5b5b5; /* Dusty rose */
+  --note-blue: #a8c9e6; /* Powder blue */
+  --note-green: #b8d4b0; /* Sage green */
+  --note-purple: #d4c4e6; /* Soft lavender */
+  --note-orange: #f9d0a7; /* Peachy cream */
+  --note-pink: #f0c4d4; /* Blush pink */
+  --note-cyan: #b8dde6; /* Soft aqua */
+  
+  --font-main: 'Inter', sans-serif;
+  --font-hand: 'Patrick Hand', cursive;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  overflow: hidden; /* For infinite canvas */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Zen Mode Animations */
+.ui-elements {
+  transition: none;
+}
+
+
+/* Animation class for UI elements after intro */
+.ui-elements.animated .sidebar,
+.ui-elements.animated .lofi-player,
+.ui-elements.animated .floating-menu-container {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.ui-elements.animated ~ .zen-mode-button {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.ui-elements.animated.show-animation .sidebar {
+  opacity: 1;
+  visibility: visible;
+  animation: slideInLeft 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.ui-elements.animated.show-animation .lofi-player {
+  opacity: 1;
+  visibility: visible;
+  animation: fadeSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s backwards;
+}
+
+.ui-elements.animated.show-animation .floating-menu-container {
+  opacity: 1;
+  visibility: visible;
+  animation: fadeSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s backwards;
+}
+
+.ui-elements.animated.show-animation ~ .zen-mode-button {
+  opacity: 1;
+  visibility: visible;
+  animation: fadeSlideIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s backwards !important;
+}
+
+
+/* Sidebar slides to the left */
+.ui-elements .sidebar {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+}
+
+.ui-elements.zen-hidden .sidebar {
+  transform: translateX(-150%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Lofi Player slides down */
+.ui-elements .lofi-player {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+}
+
+.ui-elements.zen-hidden .lofi-player {
+  transform: translateY(300%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Floating Menu slides down */
+.ui-elements .floating-menu-container {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+}
+
+.ui-elements.zen-hidden .floating-menu-container {
+  transform: translateY(300%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* Import Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Patrick+Hand&family=Quicksand:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap");
