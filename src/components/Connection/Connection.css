@@ -1,0 +1,65 @@
+/* İp Bağlantı Stilleri - MINIMAL COZY (daha görünür) */
+
+.connection-string {
+  stroke: rgba(160, 120, 100, 0.65);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  filter: drop-shadow(1px 1.5px 2px rgba(0, 0, 0, 0.15));
+  /* Path transition YOK - pinlere anında yapışık */
+  transition: stroke-width 0.2s ease, stroke 0.2s ease;
+  cursor: pointer;
+  pointer-events: stroke;
+}
+
+/* Görünmez hover alanı */
+.connection-hover-area {
+  stroke: transparent;
+  stroke-width: 12;  /* Geniş hover alanı */
+  fill: none;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.connection-string:hover {
+  stroke: rgba(140, 100, 80, 0.85);
+  stroke-width: 2.5;
+  filter: drop-shadow(1.5px 2px 3px rgba(0, 0, 0, 0.25));
+}
+
+.connection-string.selected {
+  stroke: rgba(255, 160, 80, 0.9);  /* Parlak turuncu */
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 8px rgba(255, 160, 80, 0.5));
+}
+
+/* Hafif dalgalı animasyon (opsiyonel - subtke efekt) */
+.connection-string.animated {
+  animation: subtle-wave 4s ease-in-out infinite;
+}
+
+@keyframes subtle-wave {
+  0%, 100% { 
+    stroke-dashoffset: 0; 
+  }
+  50% { 
+    stroke-dashoffset: 1; 
+  }
+}
+
+/* Geçici bağlantı çizgisi (oluşturulurken) */
+.connection-string.temporary {
+  stroke: rgba(139, 69, 19, 0.4);
+  stroke-width: 2;
+  stroke-dasharray: 5, 5;
+  animation: dash-flow 1s linear infinite;
+}
+
+@keyframes dash-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 10;
+  }
+}

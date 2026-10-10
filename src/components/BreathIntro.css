@@ -1,0 +1,82 @@
+.breath-intro {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--color-bg);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+}
+
+/* Main breathing orb */
+.breath-orb {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.orb-glow {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(224, 176, 255, 0.8),
+    rgba(173, 216, 230, 0.6),
+    rgba(255, 182, 193, 0.4),
+    transparent 70%
+  );
+  filter: blur(40px);
+  transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Initial state - small and dim */
+.breath-orb.initial .orb-glow {
+  transform: scale(0.2);
+  opacity: 0.1;
+}
+
+/* Breathe in - grow and brighten */
+.breath-orb.breathe-in .orb-glow {
+  transform: scale(2.5);
+  opacity: 1;
+}
+
+/* Breathe out - shrink to zero */
+.breath-orb.breathe-out .orb-glow {
+  transform: scale(0);
+  opacity: 0;
+}
+
+/* Instruction text */
+.breath-text {
+  font-family: var(--font-main);
+  font-size: 2rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.2em;
+  text-transform: lowercase;
+  margin: 0;
+  transition: opacity 2.5s ease-out;
+}
+
+.breath-text.initial {
+  opacity: 0.3;
+}
+
+.breath-text.breathe-in {
+  opacity: 1;
+}
+
+.breath-text.breathe-out {
+  opacity: 0;
+}

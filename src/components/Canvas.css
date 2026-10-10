@@ -1,0 +1,36 @@
+.canvas-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  cursor: grab;
+  position: relative;
+}
+
+.canvas-container:active {
+  cursor: grabbing;
+}
+
+.canvas-content {
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+/* Optional: Dotted grid pattern */
+.canvas-grid-pattern {
+  position: absolute;
+  top: -5000px;
+  left: -5000px;
+  width: 10000px;
+  height: 10000px;
+  background-image: radial-gradient(var(--color-grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: -1;
+}
