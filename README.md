@@ -1,36 +1,30 @@
-# noty
+# noty: cozy not-to-do canvas
 
-cozy-not-to-do tuvali. package adı bunu söylüyor.
+A calm, infinite-canvas notes app built with React. Sticky notes, kanban-style boards and connections live on one pannable workspace, with a lo-fi player and a zen mode.
 
-## Project State
+> **Status:** Archived. Side project from Nov–Dec 2025, unfinished. About 2.8k lines.
 
-Status: PAUSED
-Completion: 40
-Last reviewed: 2026-09-22
-Family: notes-canvas
-Resume cost: low
+![Canvas with sticky notes and boards](image.png)
 
-### Purpose
+## Features
 
-cozy-not-to-do tuvali. package adı bunu söylüyor.
+- Infinite canvas with sticky notes in several colours.
+- Boards (e.g. To do / Doing / Done columns) that hold notes.
+- Connections drawn between items.
+- Rich-text note editor with font size and style pickers, plus a context dock for colours.
+- Multiple workspaces saved in `localStorage` (no backend, no account).
+- Breathing intro animation, lo-fi music player and zen mode.
 
-### Current state
+## Tech stack
 
-Yaklaşık 2.8 bin satır. README yok.
+React 18 + Vite, lucide-react icons, plain CSS.
 
-### Missing / unfinished
+## Run
 
-Cozy Apps ailesinin parçası mı diye melos'a bağlı değil.
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # production build in dist/
+```
 
-### Next action
-
-Cozy journal ile birleştirme. Ayrı duruyor.
-
-### Important files
-
-Registry id `noty`. Source scan: 25 files, about 2847 lines, tests=False.
-
-### Related projects
-
-cozy-apps
-
+`rapor.md` is a short project report in Turkish.
